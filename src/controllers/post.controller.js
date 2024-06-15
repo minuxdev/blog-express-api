@@ -7,7 +7,6 @@ import { Op } from "sequelize";
 
 // Create
 export const createPost = async (req, res) => {
-  console.log(req.body);
   try {
     let file = null;
     if (req.files[0]) file = await req.files[0].linkUrl;
@@ -102,7 +101,6 @@ export const getPosts = async (req, res) => {
     const limit = 9;
 
     const paginator = (count, page, limit) => {
-      console.log(limit);
       return {
         prevPage: +page > 1 ? +page - 1 : null,
         currentPage: +page,
@@ -111,8 +109,6 @@ export const getPosts = async (req, res) => {
       };
     };
 
-    console.log(paginator(posts.count, page, limit));
-
     return res.status(200).json({
       status: { code: 200, text: "success" },
       // paginator: posts.count ? paginator(posts.count, page, limit) : {},
@@ -120,7 +116,6 @@ export const getPosts = async (req, res) => {
       error: null,
     });
   } catch (error) {
-    console.log(error);
     errorHandler(res, error);
   }
 };

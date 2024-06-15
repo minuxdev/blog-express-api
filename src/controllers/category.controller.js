@@ -36,3 +36,15 @@ export const getCategories = async (req, res) => {
     errorHandler(res, error);
   }
 };
+
+export const getCategory = async (req, res) => {
+  console.log(req.category);
+  return res.status(200).json({
+    status: {
+      code: 200,
+      text: "success",
+    },
+    data: req.category,
+    error: null,
+  });
+};

@@ -10,7 +10,7 @@ const uploadHandler = multer({
     acl: "publicRead",
     bucket: process.env.GCS_BUCKET,
     projectId: process.env.GCLOUD_PROJECT,
-    keyFilename: serviceAccount,
+    keyFilename: process.env.GCS_KEYFILE,
     destination: "minuxblog/",
     filename: (req, file, cb) => {
       cb(null, `${Date.now()}_${file.originalname}`);
