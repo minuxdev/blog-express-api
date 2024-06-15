@@ -1,0 +1,1247 @@
+{
+  "openapi": "3.0.1",
+
+  "info": {
+    "title": "Blog system management",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Minux Dev",
+      "email": "minux.midi@gmailcom"
+    }
+  },
+
+  "servers": [
+    { "url": "http://localhost:4422/api/v1", "description": "Development URL" }
+  ],
+
+  "apis": ["../routes/*.router.js"],
+
+  "paths": {
+    "/auth/users": {
+      "get": {
+        "description": "List all users",
+        "tags": ["users"],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return a list of users",
+            "content": {
+              "application/json": {
+                "type": "array",
+                "examples": {
+                  "Users": {
+                    "$ref": "#/components/examples/Users"
+                  }
+                }
+              }
+            }
+          },
+          "500": { "description": "Server error!" }
+        }
+      },
+
+      "post": {
+        "description": "Create new user",
+        "tags": ["users"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": { "type": "string" },
+                  "email": { "type": "string" },
+                  "password1": { "type": "string" },
+                  "password2": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Return created user",
+            "content": {
+              "schema": {
+                "type": "object",
+                "$ref": "#components/schemas/User"
+              }
+            }
+          },
+          "401": {
+            "description": "Return an error if fails to create user"
+          }
+        }
+      }
+    },
+    "/auth/users/{userID}": {
+      "get": {
+        "description": "List all users",
+        "tags": ["users"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "required": false,
+            "in": "path",
+            "name": "userID",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return user matching ID",
+            "content": {
+              "application/json": {
+                "type": "object",
+                "$ref": "#components/schemas/User"
+              }
+            }
+          },
+          "500": { "description": "Server error!" }
+        }
+      },
+
+      "put": {
+        "tags": ["users"],
+        "description": "Update used matching ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "required": true,
+            "in": "path",
+            "name": "userID",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": { "type": "string" },
+                  "email": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Return updated user",
+            "content": {
+              "schema": {
+                "type": "object",
+                "$ref": "#components/schemas/User"
+              }
+            }
+          },
+          "401": {
+            "description": "Return an error if fails to update user"
+          }
+        }
+      },
+
+      "delete": {
+        "description": "Delete user matching ID",
+        "tags": ["users"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "required": true,
+            "in": "path",
+            "name": "userID",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": { "description": "Server error!" }
+        }
+      }
+    },
+
+    "/auth/users/verify/token/": {
+      "get": {
+        "description": "Token validation",
+        "tags": ["users"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "require": true,
+            "schema": {
+              "type": "string",
+              "example": {
+                "Authorization": "Bearer tokenString"
+              }
+            },
+            "description": "Header for token validation"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return loged-in user info",
+            "content": {
+              "application/json": {
+                "type": "array",
+                "example": {
+                  "id": 1,
+                  "email": "test@email.com",
+                  "username": "username",
+                  "password": "hashedPassword",
+                  "createdAt": "04-10-2024",
+                  "active": true
+                }
+              }
+            }
+          },
+          "403": { "description": "Unouthorized access" },
+          "500": { "description": "Server error!" }
+        }
+      }
+    },
+
+    "/auth/users/profile": {
+      "get": {
+        "description": "List all profiles",
+        "tags": ["profiles"],
+        "responses": {
+          "200": {
+            "description": "Return a list of profiles",
+            "content": {
+              "application/json": {
+                "type": "array",
+                "$ref": "#components/schemas/Profile"
+              }
+            }
+          },
+          "500": { "description": "Server error!" }
+        }
+      }
+    },
+    "/auth/users/profile/{profileID}": {
+      "get": {
+        "description": "Return profile matching ID",
+        "tags": ["profiles"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "required": true,
+            "in": "path",
+            "name": "profileID",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return profile matching ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#components/schemas/Profile"
+                }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/ServerError" },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" }
+        }
+      },
+
+      "put": {
+        "tags": ["profiles"],
+        "description": "Update profile matching ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "required": true,
+            "in": "path",
+            "name": "profileID",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "$ref": "#components/schemas/Profile"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Return updated profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#components/schemas/Profile"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Return an error if fails to update profile"
+          }
+        }
+      },
+
+      "delete": {
+        "description": "Delete profile matching ID",
+        "tags": ["profiles"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "required": true,
+            "in": "path",
+            "name": "profileID",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": { "$ref": "#/components/responses/ServerError" },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" }
+        }
+      }
+    },
+
+    "/posts": {
+      "get": {
+        "description": "List all posts",
+        "tags": ["posts"],
+        "responses": {
+          "200": {
+            "description": "Return a list of posts",
+            "content": {
+              "application/json": {
+                "type": "array",
+                "examples": {
+                  "Posts": {
+                    "$ref": "#components/examples/Posts"
+                  }
+                }
+              }
+            }
+          },
+          "500": { "description": "Server error!" }
+        }
+      },
+
+      "post": {
+        "tags": ["posts"],
+        "description": "Create new post",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "type": "object",
+              "examples": {
+                "NewPost": {
+                  "$ref": "#components/examples/NewPost"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Return created post",
+            "content": {
+              "application/json": {
+                "type": "object",
+                "examples": {
+                  "Post": {
+                    "$ref": "#components/examples/Post"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Return an error if fails to create post"
+          }
+        }
+      }
+    },
+    "/posts/{postID}": {
+      "get": {
+        "description": "List all posts",
+        "tags": ["posts"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "required": true,
+            "in": "path",
+            "name": "postID",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return user matching ID",
+            "content": {
+              "application/json": {
+                "type": "object",
+                "examples": {
+                  "Post": {
+                    "$ref": "#components/examples/Post"
+                  }
+                }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/ServerError" },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" }
+        }
+      },
+
+      "put": {
+        "tags": ["posts"],
+        "description": "Update post matching ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "required": true,
+            "in": "path",
+            "name": "postID",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "$ref": "#components/schemas/Post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Return updated post",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#components/schemas/Post"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Return an error if fails to update post"
+          }
+        }
+      },
+
+      "delete": {
+        "description": "Delete post matching ID",
+        "tags": ["posts"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "required": true,
+            "in": "path",
+            "name": "postID",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": { "$ref": "#/components/responses/ServerError" },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" }
+        }
+      }
+    },
+
+    "/posts/{postID}/comments": {
+      "get": {
+        "description": "List all comments",
+        "tags": ["comments"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "postID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": 1
+            }
+          }
+        ],
+
+        "responses": {
+          "200": {
+            "description": "Return a list of comments",
+            "content": {
+              "application/json": {
+                "type": "array",
+                "$ref": "#components/schemas/Comment"
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/ServerError" },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" }
+        }
+      },
+
+      "post": {
+        "tags": ["comments"],
+        "description": "Create new comment",
+        "parameters": [
+          {
+            "name": "postID",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "example": "1"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "example": {
+                  "visitor": "@visitor-name",
+                  "content": "comment message",
+                  "tags": ["tag1", "tag2"]
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Return created comment",
+            "content": {
+              "schema": {
+                "type": "object",
+                "$ref": "#components/schemas/Comment"
+              }
+            }
+          },
+          "401": {
+            "description": "Return an error if fails to create comment"
+          }
+        }
+      }
+    },
+    "/post/comments/{commentID}": {
+      "get": {
+        "description": "Return comment matching ID",
+        "tags": ["comments"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "required": true,
+            "in": "path",
+            "name": "commentID",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return comment matching ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#components/schemas/Comment"
+                }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/ServerError" },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" }
+        }
+      },
+
+      "put": {
+        "tags": ["comments"],
+        "description": "Update comment matching ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "required": true,
+            "in": "path",
+            "name": "commentID",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "$ref": "#components/schemas/Comment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Return updated comment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#components/schemas/Comment"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Return an error if fails to update comments"
+          }
+        }
+      },
+
+      "delete": {
+        "description": "Delete comment matching ID",
+        "tags": ["comments"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "required": true,
+            "in": "path",
+            "name": "commentID",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": { "$ref": "#/components/responses/ServerError" },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" }
+        }
+      }
+    },
+
+    "/post/categories": {
+      "get": {
+        "description": "List all categories",
+        "tags": ["categories"],
+        "responses": {
+          "200": {
+            "description": "Return a list of categories",
+            "content": {
+              "application/json": {
+                "type": "array",
+                "example": [
+                  {
+                    "id": 1,
+                    "content": "category-1"
+                  },
+                  {
+                    "id": 2,
+                    "content": "category-2"
+                  }
+                ]
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/ServerError" },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" }
+        }
+      },
+
+      "post": {
+        "description": "Create new comment",
+        "tags": ["categories"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "example": {
+                  "title": "category-1"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Return created category",
+            "content": {
+              "schema": {
+                "type": "object",
+                "$ref": "#components/schemas/Category"
+              }
+            }
+          },
+          "401": {
+            "description": "Return an error if fails to create category"
+          }
+        }
+      }
+    },
+    "/post/categories/{categoryID}": {
+      "get": {
+        "description": "Return category matching ID",
+        "tags": ["categories"],
+        "parameters": [
+          {
+            "required": true,
+            "in": "path",
+            "name": "categoryID",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return category matching ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#components/schemas/Category"
+                }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/ServerError" },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" }
+        }
+      },
+
+      "put": {
+        "tags": ["categories"],
+        "description": "Update category matching ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "required": true,
+            "in": "path",
+            "name": "categoryID",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "$ref": "#components/schemas/Category"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Return updated category",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#components/schemas/Category"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Return an error if fails to update categories"
+          }
+        }
+      },
+
+      "delete": {
+        "description": "Delete category matching ID",
+        "tags": ["categories"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "required": true,
+            "in": "path",
+            "name": "categoryID",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": { "$ref": "#/components/responses/ServerError" },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" }
+        }
+      }
+    },
+
+    "/tags": {
+      "get": {
+        "description": "List all tags",
+        "tags": ["tags"],
+        "responses": {
+          "200": {
+            "description": "Return a list of tags",
+            "content": {
+              "application/json": {
+                "type": "array",
+                "example": [
+                  {
+                    "id": 1,
+                    "content": "tag-1"
+                  },
+                  {
+                    "id": 2,
+                    "content": "tag-2"
+                  }
+                ]
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/ServerError" },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" }
+        }
+      },
+
+      "post": {
+        "description": "Create new tag",
+        "tags": ["tags"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "example": {
+                  "title": "tag-1"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Return created tag",
+            "content": {
+              "schema": {
+                "type": "object",
+                "$ref": "#components/schemas/Tag"
+              }
+            }
+          },
+          "401": {
+            "description": "Return an error if fails to create tag"
+          }
+        }
+      }
+    },
+    "/tags/{tagID}": {
+      "get": {
+        "description": "Return tag matching ID",
+        "tags": ["tags"],
+        "parameters": [
+          {
+            "required": true,
+            "in": "path",
+            "name": "tagID",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return tag matching ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#components/schemas/Tag"
+                }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/ServerError" },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" }
+        }
+      },
+
+      "put": {
+        "tags": ["tags"],
+        "description": "Update tag matching ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "required": true,
+            "in": "path",
+            "name": "tagID",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "$ref": "#components/schemas/Tag"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Return updated category",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#components/schemas/Tag"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Return an error if fails to update tag"
+          }
+        }
+      },
+
+      "delete": {
+        "description": "Delete tag matching ID",
+        "tags": ["tags"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "required": true,
+            "in": "path",
+            "name": "tagID",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": { "$ref": "#/components/responses/ServerError" },
+          "401": { "$ref": "#/components/responses/UnauthorizedError" }
+        }
+      }
+    }
+  },
+
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "email": { "type": "string" },
+          "username": { "type": "string" },
+          "password": { "type": "string" },
+          "createdAt": { "type": "string", "pattern": "^d{2}-d{2}-d{4}$" },
+          "active": { "type": "boolean" }
+        },
+        "required": ["id", "email", "username", "password"],
+        "example": {
+          "id": 1,
+          "email": "test@email.com",
+          "username": "username",
+          "password": "password",
+          "createdAt": "04-10-2024",
+          "active": true
+        }
+      },
+
+      "Profile": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "userID": { "type": "integer" },
+          "username": { "type": "string" },
+          "bio": { "type": "string" },
+          "address": { "type": "string" },
+          "hobies": { "type": "array" },
+          "createdAt": { "type": "string", "pattern": "^d{2}-d{2}-d{4}$" },
+          "avatar": { "type": "string", "patter": "(?=.png)$" }
+        },
+        "required": ["id", "userID", "username"],
+        "example": {
+          "id": 1,
+          "userID": 1,
+          "username": "@username",
+          "bio": "bio content",
+          "address": "user address",
+          "hobies": ["hobie-1", "hobbie-2", "hobbie-3"],
+          "createdAt": "04-10-2024",
+          "avatar": "https://localstorage/uploads/avatars/avatar.png"
+        }
+      },
+
+      "Post": {
+        "type": "object",
+        "properties": {
+          "userID": { "type": "integer" },
+          "title": { "type": "string" },
+          "slug": { "type": "string" },
+          "summary": { "type": "string" },
+          "content": { "type": "string" },
+          "categories": { "type": "array" },
+          "tags": { "type": "array" },
+          "comments": { "type": "array" },
+          "thumbnail": { "type": "string" },
+          "published": { "type": "boolean" },
+          "createdAt": { "type": "string", "pattern": "^d{2}-d{2}-d{4}$" }
+        },
+        "required": ["userID", "title", "slug", "summary", "content"]
+      },
+
+      "Comment": {
+        "type": "object",
+        "properties": {
+          "postID": { "type": "integer" },
+          "visitor": { "type": "string" },
+          "content": { "type": "string" },
+          "createdAt": { "type": "string", "pattern": "^d{2}-d{2}-d{4}$" }
+        },
+        "required": ["postID", "visitor", "content"],
+        "example": {
+          "id": 1,
+          "postID": 1,
+          "visitor": "@visitor-name",
+          "content": "comment message",
+          "tags": ["tag1", "tag2"],
+          "published": "04-10-2024",
+          "createdAt": "04-10-2024",
+          "publishedAt": "04-10-2024"
+        }
+      },
+
+      "Tag": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "content": { "type": "string" }
+        },
+        "required": ["content"],
+        "example": {
+          "id": 1,
+          "content": "tag1"
+        }
+      },
+
+      "Category": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "title": { "type": "string" }
+        },
+        "required": ["title"],
+        "example": {
+          "id": 1,
+          "content": "category-1"
+        }
+      }
+    },
+
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+
+    "responses": {
+      "UnauthorizedError": {
+        "description": "Access token is missing or invalid"
+      },
+      "ServerError": {
+        "description": "Server Error!"
+      }
+    },
+    "examples": {
+      "NewPost": {
+        "summary": "Create new post",
+        "value": {
+          "userID": "someuseridstring",
+          "title": "Post title",
+          "summary": "Summarizing the post article",
+          "content": "main content of the article",
+          "categories": ["category-1", "category-2"],
+          "tags": ["tag-1", "tag-2"]
+        }
+      },
+      "Post": {
+        "summary": "Create new post",
+        "value": {
+          "postID": "xyzacdae",
+          "userID": "someuseridstring",
+          "title": "Post title",
+          "slug": "post-title",
+          "summary": "Summarizing the post article",
+          "content": "main content of the article",
+          "categories": ["category-1", "category-2"],
+          "tags": ["tag-1", "tag-2"],
+          "comments": [
+            {
+              "postID": "this postID",
+              "visitor": "Visitor's name",
+              "message": "The actual message message",
+              "createdAt": "04-10-2024"
+            },
+            {
+              "postID": "this postID",
+              "visitor": "Visitor's name",
+              "message": "The actual message message",
+              "createdAt": "04-10-2024"
+            }
+          ],
+          "thumbnail": "https://localstorage/uploads/thumbnails/thumbnail.png",
+          "createdAt": "04-10-2024",
+          "published": true
+        }
+      },
+      "Posts": {
+        "summary": "List of posts",
+        "value": [
+          {
+            "postID": "xyzacdae",
+            "userID": "someuseridstring",
+            "title": "Post title",
+            "slug": "post-title",
+            "summary": "Summarizing the post article",
+            "content": "main content of the article",
+            "categories": ["category-1", "category-2"],
+            "tags": ["tag-1", "tag-2"],
+            "comments": [
+              {
+                "postID": "this postID",
+                "visitor": "Visitor's name",
+                "message": "The actual message message",
+                "createdAt": "04-10-2024"
+              },
+              {
+                "postID": "this postID",
+                "visitor": "Visitor's name",
+                "message": "The actual message message",
+                "createdAt": "04-10-2024"
+              }
+            ],
+            "thumbnail": "https://localstorage/uploads/thumbnails/thumbnail.png",
+            "createdAt": "04-10-2024",
+            "published": true
+          }
+        ]
+      },
+      "Comment": {
+        "summary": "Single comment",
+        "value": {
+          "postID": "Identifies the original post",
+          "visitor": "Visitor's name",
+          "message": "The actual comment message",
+          "createdAt": "04-10-2024"
+        }
+      },
+      "Users": {
+        "summary": "List of users",
+        "value": [
+          {
+            "id": 1,
+            "email": "test@email.com",
+            "username": "username",
+            "password": "hashedPassword",
+            "createdAt": "04-10-2024",
+            "active": true
+          },
+          {
+            "id": 2,
+            "email": "test2@email.com",
+            "username": "username2",
+            "password": "hashedPassword2",
+            "createdAt": "05-10-2024",
+            "active": true
+          }
+        ]
+      }
+    }
+  }
+}

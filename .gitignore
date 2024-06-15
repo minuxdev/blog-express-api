@@ -1,0 +1,6 @@
+.vercel
+node_modules
+client
+.env
+*.bkp
+src/firebase/minuxblog-creds.json

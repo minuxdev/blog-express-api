@@ -1,0 +1,183 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "User Management API",
+    "version": "1.0.0",
+    "description": "API for managing users",
+    "contact": {
+      "name": "Admin",
+      "email": "admin@contact.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local Server"
+    }
+  ],
+
+  "paths": {
+    "/users": {
+      "get": {
+        "tags": ["Users"],
+        "description": "Get all user instances",
+        "responses": {
+          "200": {
+            "description": "Return a list of users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/User" },
+                  "example": [
+                    {
+                      "id": 1,
+                      "username": "@admin",
+                      "email": "admin@contact.com"
+                    },
+                    {
+                      "id": 2,
+                      "username": "@admin2",
+                      "email": "admin2@contact.com"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": { "description": "User not found!" }
+        }
+      },
+
+      "post": {
+        "tags": ["Users"],
+        "description": "Create new user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "#ref": "#/components/schemas/NewUser",
+                "example": {
+                  "username": "@admin",
+                  "email": "admin@contact.com",
+                  "password1": "@AdminTest!",
+                  "password2": "@AdminTest!"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully!",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "#ref": "#/components/schemas/User",
+
+                  "example": {
+                    "id": 1,
+                    "username": "@admin",
+                    "email": "admin@contact.com"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid input!",
+            "content": {
+              "example": {
+                "status": {
+                  "type": "object",
+                  "code": 404,
+                  "text": "failure"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/users/{id}": {
+      "get": {
+        "tags": ["Users"],
+        "description": "Get user by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "example": "1" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found!"
+          }
+        }
+      },
+
+      "put": {
+        "tags": ["Users"],
+        "description": "Update user instance by id",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "$ref": "#/components/schemas/User",
+                "example": [
+                  { "username": "@updatedValue" },
+                  { "email": "updatedValue@contact.com" },
+                  {
+                    "username": "@updatedValue",
+                    "email": "updatedValue@contact.com"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "username": { "type": "string" },
+          "email": { "type": "string" },
+          "active": { "type": "boolean" }
+        }
+      },
+      "NewUser": {
+        "type": "object",
+        "properties": {
+          "username": { "type": "string" },
+          "email": { "type": "string" },
+          "password1": { "type": "string" },
+          "password2": { "type": "string" }
+        }
+      }
+    }
+  }
+}
